@@ -7,3 +7,13 @@ body {
 #controls {
     margin-bottom: 20px;
 }
+
+#charts {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+svg {
+    border: 1px solid #ccc;
+}
