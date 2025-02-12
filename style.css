@@ -50,3 +50,64 @@ body {
     color: #333;
   }
   
+  /* Slider customization */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #ddd;
+    height: 2px;
+    margin: 20px 0;
+}
+
+/* Slider thumb (the draggable part) */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    background: url('simple_mouse.svg') no-repeat center center;
+    background-size: contain;
+    cursor: pointer;
+    border: none;
+}
+
+/* Firefox-specific styles */
+input[type="range"]::-moz-range-thumb {
+    width: 30px;
+    height: 30px;
+    background: url('simple_mouse.svg') no-repeat center center;
+    background-size: contain;
+    cursor: pointer;
+    border: none;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin: 20px 0;
+  }
+  
+  #gender-buttons {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .gender-button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .gender-button.active {
+    background-color: #0066cc;
+    color: white;
+  }
+  
+  .gender-button[data-gender="f"].active {
+    background-color: #cc0066;
+  }
+  
