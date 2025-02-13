@@ -1,27 +1,31 @@
 let mouseData = [];
 let timeExtent = [0, 0];
-let selectedGender = "all"; // Track selected gender
+let selectedGender = "all";  // Track selected gender
+
 const margin = { top: 40, right: 30, bottom: 50, left: 60 };
 const width = 800 - margin.left - margin.right;
 const height = 300 - margin.top - margin.bottom;
 
-d3.json("mice.json").then(data => {
-    mouseData = data;
-    timeExtent = d3.extent(mouseData, d => d.time);
-    initVisualization();
-}).catch(error => console.error("Error loading data:", error));
+// Load and initialize data
+d3.json("mice.json")
+    .then(data => {
+        mouseData = data;
+        timeExtent = d3.extent(mouseData, d => d.time);
+        initVisualization();
+    })
+    .catch(error => console.error("Error loading data:", error));
 
 function initVisualization() {
     // Organize data by gender and time
     const groupedData = d3.group(mouseData, d => d.gender);
     const genders = ["m", "f"];
-    
+
     // Sort and structure data for line charts
     genders.forEach(gender => {
-        groupedData.set(gender, d3.sort(
-            groupedData.get(gender), 
-            (a, b) => a.time - b.time
-        ));
+        groupedData.set(
+            gender, 
+            d3.sort(groupedData.get(gender), (a, b) => a.time - b.time)
+        );
     });
 
     // Create scales
@@ -29,15 +33,30 @@ function initVisualization() {
         .domain(timeExtent)
         .range([margin.left, width - margin.right]);
 
+    // Create tick values at day intervals (1 day = 1440 minutes)
+    const daysTickValues = [];
+    const totalDays = Math.ceil(timeExtent[1] / 1440);
+    for (let i = 0; i <= totalDays; i++) {
+        daysTickValues.push(i * 1440);
+    }
+
+    const xAxis = d3.axisBottom(xScale)
+        .tickValues(daysTickValues)
+        .tickFormat(d => (d / 1440).toFixed(1));  // Convert minutes to days
+
     const yTempScale = d3.scaleLinear()
-        .domain([Math.min(...mouseData.map(d => d.temperature)), 
-                Math.max(...mouseData.map(d => d.temperature))])
+        .domain([
+            Math.min(...mouseData.map(d => d.temperature)),
+            Math.max(...mouseData.map(d => d.temperature))
+        ])
         .nice()
         .range([height - margin.bottom, margin.top]);
 
     const yActivityScale = d3.scaleLinear()
-        .domain([Math.min(...mouseData.map(d => d.activity)), 
-                Math.max(...mouseData.map(d => d.activity))])
+        .domain([
+            Math.min(...mouseData.map(d => d.activity)),
+            Math.max(...mouseData.map(d => d.activity))
+        ])
         .nice()
         .range([height - margin.bottom, margin.top]);
 
@@ -60,14 +79,14 @@ function initVisualization() {
         .style("border-radius", "8px")
         .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
-    // Add axes
-    const xAxis = d3.axisBottom(xScale);
+    // Add axes to each svg
     const yTempAxis = d3.axisLeft(yTempScale);
     const yActivityAxis = d3.axisLeft(yActivityScale);
 
     // Create clip paths for slider effect
     const createClipPath = (svg, id) => {
-        svg.append("defs").append("clipPath")
+        svg.append("defs")
+            .append("clipPath")
             .attr("id", id)
             .append("rect")
             .attr("x", 0)
@@ -87,24 +106,22 @@ function initVisualization() {
             .attr("transform", `translate(${margin.left},0)`)
             .call(i === 0 ? yTempAxis : yActivityAxis);
 
-        // Add axis labels
+        // Y-axis label
         svg.append("text")
             .attr("transform", i === 0 
                 ? `translate(${margin.left - 40},${height/2 + 55}) rotate(-90)`
                 : `translate(${margin.left - 35},${height/2 + 50}) rotate(-90)`)
             .text(i === 0 ? "Temperature (°C)" : "Activity Level");
 
+        // X-axis label
         svg.append("text")
-            .attr("transform", i === 0 
-                ? `translate(${margin.left + 240},${height/2 + 90})`
-                : `translate(${margin.left + 240},${height/2 + 90})`)
-            .text(i === 0 ? "Time (in seconds)" : "Time (in seconds)");
-        
+            .attr("transform", `translate(${margin.left + 240},${height/2 + 90})`)
+            .text("Time (in days)");
 
         createClipPath(svg, i === 0 ? "temp-clip" : "activity-clip");
     });
 
-    // Line generators
+    // Line generator
     const lineGenerator = (yScale, metric) => d3.line()
         .x(d => xScale(d.time))
         .y(d => yScale(d[metric]))
@@ -136,17 +153,17 @@ function initVisualization() {
 
     // Create slider
     const slider = d3.select("#slider-container")
-    .append("input")
-    .attr("type", "range")
-    .attr("min", timeExtent[0])
-    .attr("max", timeExtent[1])
-    .attr("value", timeExtent[0])
-    .attr("class", "mouse-slider")
-    .style("width", width + "px")
-    .on("input", function() {
-        const currentTime = +this.value;
-        updateVisualization(currentTime);
-    });
+        .append("input")
+        .attr("type", "range")
+        .attr("min", timeExtent[0])
+        .attr("max", timeExtent[1])
+        .attr("value", timeExtent[0])
+        .attr("class", "mouse-slider")
+        .style("width", width + "px")
+        .on("input", function() {
+            const currentTime = +this.value;
+            updateVisualization(currentTime);
+        });
 
     // Value display setup
     const valueDisplay = d3.select("#value-display");
@@ -171,13 +188,72 @@ function initVisualization() {
             updateGenderVisibility();
         });
 
-    // Initial visibility update
+    // Initial updates
     updateGenderVisibility();
     updateVisualization(timeExtent[0]);
 }
 
+function createSVG(selector, config) {
+    return d3.select(selector)
+        .append("svg")
+        .attr("width", config.width)
+        .attr("height", config.height)
+        .classed(config.class, true)
+        .style("background-color", config.styles.backgroundColor)
+        .style("border-radius", config.styles.borderRadius)
+        .style("box-shadow", config.styles.boxShadow);
+}
+
+function drawLine(svg, data, lineGenerator, gender, clipPathId) {
+    svg.append("path")
+        .datum(data)
+        .attr("class", `line-${gender}`)
+        .attr("d", lineGenerator)
+        .attr("stroke", gender === 'f' ? '#cc0066' : '#0066cc')
+        .attr("fill", "none")
+        .attr("clip-path", `url(#${clipPathId})`);
+}
+
+function createSlider(timeExtent, width) {
+    return d3.select("#slider-container")
+        .append("input")
+        .attr("type", "range")
+        .attr("min", timeExtent[0])
+        .attr("max", timeExtent[1])
+        .attr("value", timeExtent[0])
+        .attr("class", "mouse-slider")
+        .style("width", width + "px")
+        .on("input", function() {
+            updateVisualization(+this.value);
+        });
+}
+
+function createValueDisplay(genders) {
+    const valueDisplay = d3.select("#value-display");
+    genders.forEach(gender => {
+        valueDisplay.append("div")
+            .attr("class", "value-group")
+            .attr("data-gender", gender)
+            .html(`
+                <h3>${gender === 'f' ? 'Female' : 'Male'}</h3>
+                <div class="value-item" id="${gender}-temp">Temp: --</div>
+                <div class="value-item" id="${gender}-activity">Activity: --</div>
+            `);
+    });
+}
+
+function setupGenderButtons() {
+    d3.selectAll(".gender-button")
+        .on("click", function() {
+            const gender = d3.select(this).attr("data-gender");
+            selectedGender = gender;
+            d3.selectAll(".gender-button").classed("active", false);
+            d3.select(this).classed("active", true);
+            updateGenderVisibility();
+        });
+}
+
 function updateVisualization(currentTime) {
-    // Find the exact time data point
     const currentData = mouseData.filter(d => d.time === currentTime);
 
     // Update value display
@@ -198,7 +274,6 @@ function updateVisualization(currentTime) {
 }
 
 function updateGenderVisibility() {
-    // Update line visibility
     d3.selectAll(".line-m, .line-f")
         .style("opacity", function() {
             const genderClass = d3.select(this).attr("class");
@@ -206,7 +281,6 @@ function updateGenderVisibility() {
             return selectedGender === "all" || gender === selectedGender ? 1 : 0;
         });
 
-    // Update value display visibility
     d3.selectAll(".value-group")
         .style("display", function() {
             const gender = d3.select(this).attr("data-gender");
