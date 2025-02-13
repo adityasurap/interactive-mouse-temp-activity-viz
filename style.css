@@ -4,11 +4,6 @@ body {
     background-color: #f5f5f5;
   }
   
-  #slider-container {
-    margin: 20px auto;
-    width: 800px;
-  }
-  
   #charts {
     display: flex;
     flex-direction: column;
@@ -117,4 +112,16 @@ h1 {
   .gender-button[data-gender="f"].active {
     background-color: #cc0066;
   }
-  
+
+/* Ensure the slider container serves as a positioning context */
+#slider-container {
+  margin: 20px auto;
+  width: 800px;
+  position: relative;
+}
+
+#slider-container input[type="range"] {
+  display: block;
+  margin-left: 60px;
+  margin-right: 30px;
+}
