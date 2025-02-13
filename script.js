@@ -46,13 +46,19 @@ function initVisualization() {
         .append("svg")
         .attr("width", width)
         .attr("height", height)
-        .classed("chart", true);
+        .classed("chart", true)
+        .style("background-color", "#fafafa")
+        .style("border-radius", "8px")
+        .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
     const activitySvg = d3.select("#activity-chart")
         .append("svg")
         .attr("width", width)
         .attr("height", height)
-        .classed("chart", true);
+        .classed("chart", true)
+        .style("background-color", "#fafafa")
+        .style("border-radius", "8px")
+        .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
     // Add axes
     const xAxis = d3.axisBottom(xScale);
@@ -84,9 +90,16 @@ function initVisualization() {
         // Add axis labels
         svg.append("text")
             .attr("transform", i === 0 
-                ? `translate(${margin.left - 40},${height/2}) rotate(-90)`
-                : `translate(${margin.left - 40},${height/2}) rotate(-90)`)
+                ? `translate(${margin.left - 40},${height/2 + 55}) rotate(-90)`
+                : `translate(${margin.left - 35},${height/2 + 50}) rotate(-90)`)
             .text(i === 0 ? "Temperature (°C)" : "Activity Level");
+
+        svg.append("text")
+            .attr("transform", i === 0 
+                ? `translate(${margin.left + 240},${height/2 + 90})`
+                : `translate(${margin.left + 240},${height/2 + 90})`)
+            .text(i === 0 ? "Time (in seconds)" : "Time (in seconds)");
+        
 
         createClipPath(svg, i === 0 ? "temp-clip" : "activity-clip");
     });

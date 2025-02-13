@@ -14,7 +14,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 40px;
-    margin: 20px 0;
+    margin: 40px 0;
   }
   
   .chart {
@@ -38,17 +38,23 @@ body {
     text-align: center;
   }
   
-  .value-group h3 {
-    margin: 0 0 8px 0;
-    color: #666;
-    font-size: 14px;
-  }
-  
+  .value-group {
+    text-align: center;
+    border: 2px solid #ccc;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
   .value-item {
     margin: 4px 0;
     font-size: 16px;
     color: #333;
-  }
+    padding-left: 15px;
+    padding-right: 15px;
+    font-weight: 600;
+}
   
   /* Slider customization */
 input[type="range"] {
@@ -63,8 +69,8 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
     background: url('simple_mouse.svg') no-repeat center center;
     background-size: contain;
     cursor: pointer;
@@ -73,8 +79,8 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* Firefox-specific styles */
 input[type="range"]::-moz-range-thumb {
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
     background: url('simple_mouse.svg') no-repeat center center;
     background-size: contain;
     cursor: pointer;
@@ -83,6 +89,7 @@ input[type="range"]::-moz-range-thumb {
 
 h1 {
     text-align: center;
+    padding-top: 5px;
     color: #333;
     margin: 20px 0;
   }
