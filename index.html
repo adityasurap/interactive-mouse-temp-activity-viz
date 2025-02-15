@@ -3,23 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DSC 106 | Project 3</title>
+  <title>MouseWatch</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-  <h1>How do the body temperatures/activity levels of male/female mice differ? What trends can we observer over time?</h1>
+  <div id="title">MouseWatch</div>
+
+  <div id="question">
+    What trends emerge in body temperature and activity levels between male and female mice over time?
+  </div>
+
+  <!-- Gender Buttons -->
   <div id="gender-buttons">
     <button class="gender-button active" data-gender="all">All</button>
     <button class="gender-button" data-gender="m">Male</button>
     <button class="gender-button" data-gender="f">Female</button>
   </div>
+
+  <!-- Instructional Text -->
+  <div id="instruction">
+    Try it! Move the mouse along the slider to find out!
+  </div>
+
+  <!-- Slider Container -->
   <div id="slider-container"></div>
+
+  <!-- Charts -->
   <div id="charts">
     <div id="temperature-chart"></div>
     <div id="activity-chart"></div>
   </div>
+
+  <div id="shading-legend">
+    <div class="legend-item">
+        <div class="legend-color-box" style="background-color: rgba(0, 0, 0, 0.05);"></div>
+        <div class="legend-label">No Light (Nighttime)</div>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color-box" style="background-color: transparent; border: 1px solid #ccc;"></div>
+        <div class="legend-label">Light (Daytime)</div>
+    </div>
+  </div>
+
+  <!-- Value Display -->
   <div id="value-display"></div>
+
+  <!-- Write-Up Section -->
+  <div id="write-up">
+    <h3>Motivation</h3>
+    <p>
+      MouseWatch was created in order for users to explore how body temperature, along with activity levels, differ between male/female mice over time. The interactive visualization was based on data collected from an observational experiment in which the body temperature/activity levels of mice (of both genders) were recorded to the minute. To ensure the mice maintained body clock rhythms, the lighting in the environment was adjusted every twelve hours; the first twelve hours of each day consisted of no lighting, to simulate nighttime, while the second twelve hours of each day consisted of lighting, to simulate daytime. The overall goal was to enable users to identify trends in the data, such as whether male or female mice experience higher body temperatures during each lighting period, whether male or female mice experience higher activity levels during each lighting period, the peak body temperature or activity level for each gender, and much more. By providing an interactive, intuitive way to explore these trends, MouseWatch empowers users to uncover meaningful insights into the biological rhythms of mice, which could be useful for future research.
+    </p>
+    <h3>Design Rationale</h3>
+    <h3>Development Process</h3>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

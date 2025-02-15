@@ -1,26 +1,23 @@
 let mouseData = [];
 let timeExtent = [0, 0];
-let selectedGender = "all";  // Track selected gender
+let selectedGender = "all";
 
 const margin = { top: 40, right: 30, bottom: 50, left: 60 };
 const width = 800 - margin.left - margin.right;
 const height = 300 - margin.top - margin.bottom;
 
-// Load and initialize data
 d3.json("mice.json")
     .then(data => {
         mouseData = data;
         timeExtent = d3.extent(mouseData, d => d.time);
         initVisualization();
     })
-    .catch(error => console.error("Error loading data:", error));
+    .catch(error => console.error("Error Loading Data:", error));
 
 function initVisualization() {
-    // Organize data by gender and time
     const groupedData = d3.group(mouseData, d => d.gender);
     const genders = ["m", "f"];
 
-    // Sort and structure data for line charts
     genders.forEach(gender => {
         groupedData.set(
             gender, 
@@ -28,12 +25,10 @@ function initVisualization() {
         );
     });
 
-    // Create scales
     const xScale = d3.scaleLinear()
         .domain(timeExtent)
         .range([margin.left, width - margin.right]);
 
-    // Create tick values at day intervals (1 day = 1440 minutes)
     const daysTickValues = [];
     const totalDays = Math.ceil(timeExtent[1] / 1440);
     for (let i = 0; i <= totalDays; i++) {
@@ -42,7 +37,7 @@ function initVisualization() {
 
     const xAxis = d3.axisBottom(xScale)
         .tickValues(daysTickValues)
-        .tickFormat(d => (d / 1440).toFixed(1));  // Convert minutes to days
+        .tickFormat(d => (d / 1440).toFixed(1));
 
     const yTempScale = d3.scaleLinear()
         .domain([
@@ -60,7 +55,6 @@ function initVisualization() {
         .nice()
         .range([height - margin.bottom, margin.top]);
 
-    // Create SVG containers
     const tempSvg = d3.select("#temperature-chart")
         .append("svg")
         .attr("width", width)
@@ -79,11 +73,9 @@ function initVisualization() {
         .style("border-radius", "8px")
         .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
-    // Add axes to each svg
     const yTempAxis = d3.axisLeft(yTempScale);
     const yActivityAxis = d3.axisLeft(yActivityScale);
 
-    // Create clip paths for slider effect
     const createClipPath = (svg, id) => {
         svg.append("defs")
             .append("clipPath")
@@ -96,43 +88,46 @@ function initVisualization() {
     };
 
     [tempSvg, activitySvg].forEach((svg, i) => {
-        // X-axis
+        
         svg.append("g")
             .attr("transform", `translate(0,${height - margin.bottom})`)
             .call(xAxis);
         
-        // Y-axis
+        
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(i === 0 ? yTempAxis : yActivityAxis);
 
-        // Y-axis label
+        
         svg.append("text")
             .attr("transform", i === 0 
                 ? `translate(${margin.left - 40},${height/2 + 55}) rotate(-90)`
                 : `translate(${margin.left - 35},${height/2 + 50}) rotate(-90)`)
             .text(i === 0 ? "Temperature (°C)" : "Activity Level");
 
-        // X-axis label
+        
         svg.append("text")
             .attr("transform", `translate(${margin.left + 240},${height/2 + 90})`)
-            .text("Time (in days)");
+            .text("Time (in Days)");
 
         createClipPath(svg, i === 0 ? "temp-clip" : "activity-clip");
     });
 
-    // Line generator
+    addDarkLightLines(tempSvg, xScale, margin, height);
+    addDarkLightLines(activitySvg, xScale, margin, height);
+
+    addShadedSections(tempSvg, xScale, margin, height);
+    addShadedSections(activitySvg, xScale, margin, height);
+
     const lineGenerator = (yScale, metric) => d3.line()
         .x(d => xScale(d.time))
         .y(d => yScale(d[metric]))
         .defined(d => d.time);
 
-    // Draw lines for both metrics
     genders.forEach(gender => {
         const color = gender === 'f' ? '#cc0066' : '#0066cc';
         const data = groupedData.get(gender);
 
-        // Temperature line
         tempSvg.append("path")
             .datum(data)
             .attr("class", `line-${gender}`)
@@ -141,7 +136,6 @@ function initVisualization() {
             .attr("fill", "none")
             .attr("clip-path", "url(#temp-clip)");
 
-        // Activity line
         activitySvg.append("path")
             .datum(data)
             .attr("class", `line-${gender}`)
@@ -151,7 +145,6 @@ function initVisualization() {
             .attr("clip-path", "url(#activity-clip)");
     });
 
-    // Create slider
     const slider = d3.select("#slider-container")
         .append("input")
         .attr("type", "range")
@@ -165,7 +158,6 @@ function initVisualization() {
             updateVisualization(currentTime);
         });
 
-    // Value display setup
     const valueDisplay = d3.select("#value-display");
     genders.forEach(gender => {
         valueDisplay.append("div")
@@ -178,7 +170,6 @@ function initVisualization() {
             `);
     });
 
-    // Add gender buttons functionality
     d3.selectAll(".gender-button")
         .on("click", function() {
             const gender = d3.select(this).attr("data-gender");
@@ -188,7 +179,6 @@ function initVisualization() {
             updateGenderVisibility();
         });
 
-    // Initial updates
     updateGenderVisibility();
     updateVisualization(timeExtent[0]);
 }
@@ -256,7 +246,6 @@ function setupGenderButtons() {
 function updateVisualization(currentTime) {
     const currentData = mouseData.filter(d => d.time === currentTime);
 
-    // Update value display
     currentData.forEach(d => {
         d3.select(`#${d.gender}-temp`)
             .text(`Temp: ${d.temperature.toFixed(2)}°C`);
@@ -264,7 +253,7 @@ function updateVisualization(currentTime) {
             .text(`Activity: ${d.activity.toFixed(2)}`);
     });
 
-    // Update clip paths
+
     const xPos = d3.scaleLinear()
         .domain(timeExtent)
         .range([margin.left, width - margin.right])(currentTime);
@@ -286,4 +275,34 @@ function updateGenderVisibility() {
             const gender = d3.select(this).attr("data-gender");
             return selectedGender === "all" || gender === selectedGender ? "block" : "none";
         });
+}
+
+function addDarkLightLines(svg, xScale, margin, height) {
+    const totalTime = timeExtent[1]; // Total time in minutes
+    for (let time = 0; time <= totalTime; time += 720) { // Every 12 hours (720 minutes)
+        const xPos = xScale(time); // Calculate x-position
+        svg.append("line")
+            .attr("x1", xPos)
+            .attr("y1", margin.top)
+            .attr("x2", xPos)
+            .attr("y2", height - margin.bottom)
+            .attr("stroke", "#ccc") // Light gray color
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "2,2"); // Dashed line
+    }
+}
+
+function addShadedSections(svg, xScale, margin, height) {
+    const totalTime = timeExtent[1]; // Total time in minutes
+    for (let time = 0; time < totalTime; time += 1440) { // Every 24 hours (1440 minutes)
+        const start = xScale(time); // Start of the shaded section
+        const end = xScale(time + 720); // End of the shaded section (12 hours later)
+        svg.append("rect")
+            .attr("x", start)
+            .attr("y", margin.top)
+            .attr("width", end - start)
+            .attr("height", height - margin.bottom - margin.top)
+            .attr("fill", "rgba(0, 0, 0, 0.05)") // Light gray shading
+            .attr("stroke", "none");
+    }
 }
