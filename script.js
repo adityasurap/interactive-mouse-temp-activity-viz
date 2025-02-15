@@ -5,6 +5,8 @@ let selectedGender = "all";
 const margin = { top: 40, right: 30, bottom: 50, left: 60 };
 const width = 800 - margin.left - margin.right;
 const height = 300 - margin.top - margin.bottom;
+const clickSound = new Audio("mouse-squeaking.mp3");
+
 
 d3.json("mice.json")
     .then(data => {
@@ -170,18 +172,35 @@ function initVisualization() {
             `);
     });
 
+    const volume = d3.select("#volume-container")
+        .append("input")
+        .attr("type", "range")
+        .attr("min", 0)
+        .attr("max", 1)
+        .attr("step", 0.01)
+        .attr("value", 1)
+        .attr("id", "volume")
+        .on("input", function() {
+            clickSound.volume = +this.value;
+    });
+
+
     d3.selectAll(".gender-button")
         .on("click", function() {
             const gender = d3.select(this).attr("data-gender");
             selectedGender = gender;
+            clickSound.play();
             d3.selectAll(".gender-button").classed("active", false);
             d3.select(this).classed("active", true);
             updateGenderVisibility();
         });
+    
 
     updateGenderVisibility();
     updateVisualization(timeExtent[0]);
 }
+
+
 
 function createSVG(selector, config) {
     return d3.select(selector)
@@ -237,6 +256,7 @@ function setupGenderButtons() {
         .on("click", function() {
             const gender = d3.select(this).attr("data-gender");
             selectedGender = gender;
+            clickSound.play();
             d3.selectAll(".gender-button").classed("active", false);
             d3.select(this).classed("active", true);
             updateGenderVisibility();

@@ -112,14 +112,26 @@ h1 {
 
 #slider-container {
   margin: 20px auto;
-  width: 800px;
+  width: 750px;
   position: relative;
 }
 
 #slider-container input[type="range"] {
   display: block;
-  margin-left: 60px;
+  margin-left: 20px;
   margin-right: 30px;
+}
+
+#slider-container::after {
+  content: "";
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: url('cheese.webp') no-repeat center center;
+  background-size: contain;
 }
 
 #title {
@@ -214,4 +226,23 @@ h1 {
 
 #write-up ul li {
   margin-bottom: 10px;
+}
+
+#volume-container{
+  position:absolute;
+  top:1rem;
+  right:3rem;
+  font-size: 80%;
+  font-family: inherit;
+}
+#volume-container::after {
+  content: "";
+  position: absolute;
+  right: -45px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: url('cheese.webp') no-repeat center center;
+  background-size: contain;
 }
