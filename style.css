@@ -177,9 +177,9 @@ h1 {
 }
 
 .legend-color-box {
-  width: 16px;
+  width: 32px;
   height: 16px;
-  border: 1px solid #ccc; /* Border for both boxes */
+  border: 1px dashed #ccc; /* Border for both boxes */
 }
 
 .legend-label {
